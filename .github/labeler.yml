@@ -1,13 +1,10 @@
 # Documentation: https://github.com/actions/labeler
 
-test:
-  - src/**/*.spec.js
-
 ci:
   - .github/**
 
 documentation:
-  - "**/*.md"
+  - '**/*.md'
 
 dependencies:
   - package.json
