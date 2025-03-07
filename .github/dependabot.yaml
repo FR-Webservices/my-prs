@@ -13,6 +13,28 @@ updates:
       - florianrusch
     labels:
       - dependencies
+    groups:
+      # Prod dependencies
+      production-minor-patch-dependencies:
+        dependency-type: 'production'
+        update-types:
+          - 'patch'
+          - 'minor'
+      production-major-dependencies:
+        dependency-type: 'production'
+        update-types:
+          - 'major'
+
+      # Dev dependencies
+      development-minor-patch-dependencies:
+        dependency-type: 'development'
+        update-types:
+          - 'patch'
+          - 'minor'
+      development-major-dependencies:
+        dependency-type: 'development'
+        update-types:
+          - 'major'
 
   - package-ecosystem: github-actions
     directory: /
