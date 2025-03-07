@@ -1,11 +1,14 @@
 # Documentation: https://github.com/actions/labeler
 
 ci:
-  - .github/**
+  - changed-files:
+    - any-glob-to-any-file: .github/**
 
 documentation:
-  - '**/*.md'
+  - changed-files:
+    - any-glob-to-any-file: "**/*.md"
 
 dependencies:
-  - package.json
-  - package-lock.json
+  - changed-files:
+    - any-glob-to-any-file: package.json
+    - any-glob-to-any-file: package-lock.json
