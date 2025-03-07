@@ -10,7 +10,7 @@ changelog:
         - bug
     - title: New Features & Improvements
       labels:
-        - "*"
+        - '*'
     - title: Documentation
       labels:
-        - docu
+        - documentation

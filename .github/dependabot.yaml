@@ -21,5 +21,4 @@ updates:
     reviewers:
       - florianrusch
     labels:
-      - dependencies
       - ci
