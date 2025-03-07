@@ -1,0 +1,14 @@
+# Documentation: https://github.com/actions/labeler
+
+test:
+  - src/**/*.spec.js
+
+ci:
+  - .github/**
+
+documentation:
+  - "**/*.md"
+
+dependencies:
+  - package.json
+  - package-lock.json
