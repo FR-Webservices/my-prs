@@ -13,7 +13,7 @@ updates:
       - florianrusch
     labels:
       - dependencies
-    commit_message:
+    commit-message:
       prefix: 'chore'
     groups:
       # Prod dependencies
@@ -46,6 +46,5 @@ updates:
       - florianrusch
     labels:
       - ci
-    commit_message:
+    commit-message:
       prefix: 'ci'
-      include_scope: true
