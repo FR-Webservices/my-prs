@@ -3,7 +3,7 @@ import { type RestEndpointMethodTypes } from '@octokit/plugin-rest-endpoint-meth
 import { ref } from 'vue'
 import { useStorage } from '@vueuse/core'
 
-const pat = useStorage('github-pat', "")
+const pat = useStorage('github-pat', '')
 const username = ref('')
 const initialized = ref(false)
 
@@ -25,9 +25,14 @@ export function useGitHub(): UseGitHubReturn {
     let patPrompt: string | null
 
     while (true) {
-    // Create a personal access token at https://github.com/settings/tokens/new?scopes=repo
-      patPrompt = prompt("Please enter your personal access token from GitHub. It should have at least the \"repo\" scope enabled to get also access to private repositories", "");
-      if (!patPrompt?.match(/^(gh[ps]_[a-zA-Z0-9]{36}|github_pat_[a-zA-Z0-9]{22}_[a-zA-Z0-9]{59})$/)) {
+      // Create a personal access token at https://github.com/settings/tokens/new?scopes=repo
+      patPrompt = prompt(
+        'Please enter your personal access token from GitHub. It should have at least the "repo" scope enabled to get also access to private repositories',
+        '',
+      )
+      if (
+        !patPrompt?.match(/^(gh[ps]_[a-zA-Z0-9]{36}|github_pat_[a-zA-Z0-9]{22}_[a-zA-Z0-9]{59})$/)
+      ) {
         alert("You haven't entered a valid token! Please try again.")
       }
       break
@@ -75,6 +80,8 @@ export function useGitHub(): UseGitHubReturn {
     octokit.rest.users.getAuthenticated().then((data) => {
       username.value = data.data.login
     })
+
+    initialized.value = true
   }
 
   return {
