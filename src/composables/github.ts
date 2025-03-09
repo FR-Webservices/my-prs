@@ -1,8 +1,12 @@
 import { Octokit } from 'octokit'
 import { type RestEndpointMethodTypes } from '@octokit/plugin-rest-endpoint-methods'
 import { ref } from 'vue'
+import { useStorage } from '@vueuse/core'
 
-export const username = ref('')
+const pat = useStorage('github-pat', '')
+const username = ref('')
+const initialized = ref(false)
+
 let octokit: Octokit
 
 interface UseGitHubReturn {
@@ -17,17 +21,24 @@ interface UseGitHubReturn {
 }
 
 export function useGitHub(): UseGitHubReturn {
-  if (username.value == '') {
-    // Create a personal access token at https://github.com/settings/tokens/new?scopes=repo
-    octokit = new Octokit({
-      auth: ``,
-      userAgent: 'my-github-todos/v0.0.0',
-    })
+  const askForPat = (): string => {
+    let patPrompt: string | null
 
-    octokit.rest.users.getAuthenticated().then((data) => {
-      username.value = data.data.login
-      console.log('Hello, %s', username.value)
-    })
+    while (true) {
+      // Create a personal access token at https://github.com/settings/tokens/new?scopes=repo
+      patPrompt = prompt(
+        'Please enter your personal access token from GitHub. It should have at least the "repo" scope enabled to get also access to private repositories',
+        '',
+      )
+      if (
+        !patPrompt?.match(/^(gh[ps]_[a-zA-Z0-9]{36}|github_pat_[a-zA-Z0-9]{22}_[a-zA-Z0-9]{59})$/)
+      ) {
+        alert("You haven't entered a valid token! Please try again.")
+      }
+      break
+    }
+
+    return patPrompt!
   }
 
   const getOpenPullRequests = async (): Promise<
@@ -54,6 +65,23 @@ export function useGitHub(): UseGitHubReturn {
       name: match.groups.name,
       owner: match.groups.owner,
     }
+  }
+
+  if (!initialized.value) {
+    if (pat.value.length == 0) {
+      pat.value = askForPat()
+    }
+
+    octokit = new Octokit({
+      auth: pat.value,
+      userAgent: 'my-prs/v0.0.0',
+    })
+
+    octokit.rest.users.getAuthenticated().then((data) => {
+      username.value = data.data.login
+    })
+
+    initialized.value = true
   }
 
   return {
