@@ -45,7 +45,7 @@ export function useGitHub(): UseGitHubReturn {
     RestEndpointMethodTypes['search']['issuesAndPullRequests']['response']
   > => {
     return octokit.rest.search.issuesAndPullRequests({
-      q: 'review-requested:@me+type:pr+state:open',
+      q: 'type:pr+state:open+involves:@me',
       sort: 'updated',
     })
   }
