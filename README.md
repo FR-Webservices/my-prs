@@ -1,4 +1,4 @@
-# [<img title="My PRs Logo" src="https://raw.githubusercontent.com/FR-Webservices/my-prs/refs/heads/main/dev_assets/Logo.svg" height="32" /> My PRs](https://my-ps.com)
+# [<img title="My PRs Logo" src="https://raw.githubusercontent.com/FR-Webservices/my-prs/refs/heads/main/dev_assets/Logo.svg" height="32" /> My PRs](https://my-prs.com)
 
 [My PRs](https://my-prs.com) is a website that makes developers' lives easier. Often, especially as senior developers, we “work” on several pull requests at the same time (e.g. we are working on an urgent bug fix while the current Festure PR is still in draft and checking the code changes of three other developers in parallel).
 
@@ -13,7 +13,7 @@
 
 Everyone is more than welcome to contribute to this project! That's what open source is all about!
 
-To have some contribution guidance, please have a look at [CONTRIBUTING.md](CONTRIBUTING.md).
+To have some contribution guidance, please have a look at [CONTRIBUTING.md](./CONTRIBUTING.md).
 
 ## 🧑‍💻 Development
 
@@ -43,4 +43,4 @@ npm run lint
 
 ##  License
 
-The source code of "My PRs" is free and unencumbered public domain software. For more information, see <https://unlicense.org/> or the accompanying [LICENSE](/LICENSE) file.
+The source code of "My PRs" is free and unencumbered public domain software. For more information, see <https://unlicense.org/> or the accompanying [LICENSE](./LICENSE) file.
