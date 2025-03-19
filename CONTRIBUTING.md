@@ -48,7 +48,7 @@ npm run build
 
 ### Usage of mkcert
 
-We are using for local development purposes also HTTP**S**. To make it simple for the developer, we are using [mkcert](://github.com/FiloSottile/mkcert) which was made to use one local Certificate Authority (CA) for all local development projects.
+We are using for local development purposes also HTTP**S**. To make it simple for the developer, we are using [mkcert](https://github.com/FiloSottile/mkcert) which was made to use one local Certificate Authority (CA) for all local development projects.
 
 As we are using vite for hosting our local development server, we are also using the [vite-plugin-mkcert](https://github.com/liuweiGL/vite-plugin-mkcert) to configure and set up mkcert
 
