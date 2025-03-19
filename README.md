@@ -7,7 +7,7 @@
 ## Current limitations
 
 - only works with GitHub
-- only supports perspanl access token (PAT) for authemtication
+- only supports personal access token (PAT) for authemtication
 
 ## 🤝 Contribution
 
