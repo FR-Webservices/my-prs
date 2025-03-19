@@ -21,7 +21,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="pull in pullRequests" :key="pull.id" class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200 cursor-pointer" @click="openWebpage(pull.html_url)">
+        <tr v-for="pull in getPullRequests()" :key="pull.id" class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200 cursor-pointer" @click="openWebpage(pull.html_url)">
           <td class="px-6 py-1">
             <div class="inline pr-1">
               <IconDraft v-if="pull.draft" class="inline" />
@@ -51,24 +51,12 @@
 
 <script setup lang="ts">
 import { useGitHub } from '@/composables/github';
-import { type RestEndpointMethodTypes } from "@octokit/plugin-rest-endpoint-methods";
-import { reactive } from 'vue';
 import invert from 'invert-color';
 import '@github/relative-time-element';
 import IconDraft from '@/icons/IconDraft.vue';
 import IconMergeable from '@/icons/IconMergeable.vue';
 
-const pullRequests: RestEndpointMethodTypes["search"]["issuesAndPullRequests"]["response"]["data"]["items"] = reactive([])
-
-const { getOpenPullRequests, extractGitHubRepoFromUrl } = useGitHub()
-
-getOpenPullRequests().then((response) => {
-  console.log(response)
-  response.data.items.forEach(async (pull) => {
-    pullRequests.push(pull)
-  })
-  console.log("Pull-requests successfully fetched", pullRequests.length)
-})
+const { getPullRequests, extractGitHubRepoFromUrl } = useGitHub()
 
 const getRepoString = (url: string): string => {
   const { owner, name } = extractGitHubRepoFromUrl(url)

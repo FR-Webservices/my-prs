@@ -1,1 +1,16 @@
 @import 'tailwindcss';
+
+@theme inline {
+  --color-text: var(--color-gray-300);
+  --color-primary: var(--color-emerald-400);
+
+  --color-background: var(--color-zinc-950);
+
+  --color-select-overlay-background: var(--color-zinc-900);
+  --color-select-option-focus-background: color-mix(in srgb, var(--color-primary), transparent 76%);
+}
+
+html {
+  background-color: var(--color-background);
+  color: var(--color-text);
+}

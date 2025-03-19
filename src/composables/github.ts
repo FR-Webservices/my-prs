@@ -1,23 +1,33 @@
 import { Octokit } from 'octokit'
-import { type RestEndpointMethodTypes } from '@octokit/plugin-rest-endpoint-methods'
 import { ref } from 'vue'
 import { useStorage } from '@vueuse/core'
+import { githubPatKey, pullRequestsKey, refreshIntervalKey } from '@/localStorageKeys'
+import {
+  type PullRequestLocalStorage,
+  type PullRequestSearchItem,
+  type RepositoryResponse,
+} from '@/models/PullRequest'
+import { initialDefaultTiming } from '@/models/RefreshTiming'
 
-const pat = useStorage('github-pat', '')
+export const isLoadingPullRequests = ref(false)
+
+const pat = useStorage(githubPatKey, '')
 const username = ref('')
 const initialized = ref(false)
+const refreshIntervalTime = useStorage<number>(refreshIntervalKey, initialDefaultTiming)
+const pullRequest = useStorage<PullRequestLocalStorage>(pullRequestsKey, {})
+
+let refreshInterval: number | undefined = undefined
 
 let octokit: Octokit
 
 interface UseGitHubReturn {
-  getOpenPullRequests: () => Promise<
-    RestEndpointMethodTypes['search']['issuesAndPullRequests']['response']
-  >
   extractGitHubRepoFromUrl: (url: string) => { owner: string; name: string }
-  getRepository: (
-    owner: string,
-    name: string,
-  ) => Promise<RestEndpointMethodTypes['repos']['get']['response']>
+  fetchPullRequests: () => void
+  getPullRequests: () => PullRequestSearchItem[]
+  getRepository: (owner: string, name: string) => Promise<RepositoryResponse>
+  setInterval: (interval: number) => void
+  getInterval: () => number
 }
 
 export function useGitHub(): UseGitHubReturn {
@@ -41,19 +51,30 @@ export function useGitHub(): UseGitHubReturn {
     return patPrompt!
   }
 
-  const getOpenPullRequests = async (): Promise<
-    RestEndpointMethodTypes['search']['issuesAndPullRequests']['response']
-  > => {
-    return octokit.rest.search.issuesAndPullRequests({
-      q: 'type:pr+state:open+involves:@me',
-      sort: 'updated',
-    })
+  const fetchPullRequests = async () => {
+    console.log('fetchPullRequests: start')
+    isLoadingPullRequests.value = true
+
+    octokit
+      .paginate(octokit.rest.search.issuesAndPullRequests, {
+        q: 'type:pr+state:open+involves:@me',
+        sort: 'updated',
+      })
+      .then((pullRequests: PullRequestSearchItem[]) => {
+        pullRequests.forEach((pr) => {
+          pullRequest.value[pr.id] = pr
+        })
+        isLoadingPullRequests.value = false
+      })
   }
 
-  const getRepository = async (
-    owner: string,
-    name: string,
-  ): Promise<RestEndpointMethodTypes['repos']['get']['response']> => {
+  const getPullRequests = (): PullRequestSearchItem[] => {
+    return Object.values<PullRequestSearchItem>(pullRequest.value).sort(
+      (a, b) => Date.parse(b.updated_at) - Date.parse(a.updated_at),
+    )
+  }
+
+  const getRepository = async (owner: string, name: string): Promise<RepositoryResponse> => {
     return octokit.rest.repos.get({ owner: owner, repo: name })
   }
 
@@ -65,6 +86,42 @@ export function useGitHub(): UseGitHubReturn {
       name: match.groups.name,
       owner: match.groups.owner,
     }
+  }
+
+  const setInterval = (intervalInput: number) => {
+    console.log('setInterval', intervalInput)
+    refreshIntervalTime.value = intervalInput
+
+    if (refreshIntervalTime.value === -1) {
+      clearRefreshInterval()
+      return
+    }
+
+    setupRefreshInterval(intervalInput)
+  }
+
+  const getInterval = (): number => {
+    console.log('getInterval', refreshIntervalTime.value)
+    return refreshIntervalTime.value
+  }
+
+  const setupRefreshInterval = (newIntervalTime: number): void => {
+    console.log('setupRefreshInterval: start', newIntervalTime)
+    if (refreshInterval !== undefined) {
+      clearRefreshInterval()
+    }
+
+    if (refreshIntervalTime.value === -1) {
+      console.log('setupRefreshInterval: disabled')
+      return
+    }
+
+    refreshInterval = window.setInterval(fetchPullRequests, newIntervalTime)
+  }
+
+  const clearRefreshInterval = () => {
+    console.log('setupRefreshInterval: clear interval')
+    window.clearInterval(refreshInterval)
   }
 
   if (!initialized.value) {
@@ -82,11 +139,15 @@ export function useGitHub(): UseGitHubReturn {
     })
 
     initialized.value = true
+    setupRefreshInterval(refreshIntervalTime.value)
   }
 
   return {
-    getOpenPullRequests,
-    extractGitHubRepoFromUrl,
+    getPullRequests,
     getRepository,
+    extractGitHubRepoFromUrl,
+    fetchPullRequests,
+    setInterval,
+    getInterval,
   }
 }
