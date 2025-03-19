@@ -9,6 +9,12 @@
 - only works with GitHub
 - only supports perspanl access token (PAT) for authemtication
 
+## 🤝 Contribution
+
+Everyone is more than welcome to contribute to this project! That's what open source is all about!
+
+To have some contribution guidance, please have a look at [CONTRIBUTING.md](CONTRIBUTING.md).
+
 ## 🧑‍💻 Development
 
 ### Installing dependencies
@@ -34,3 +40,7 @@ npm run build
 ```sh
 npm run lint
 ```
+
+##  License
+
+The source code of "My PRs" is free and unencumbered public domain software. For more information, see <https://unlicense.org/> or the accompanying [LICENSE](/LICENSE) file.
