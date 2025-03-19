@@ -61,9 +61,22 @@ export function useGitHub(): UseGitHubReturn {
         sort: 'updated',
       })
       .then((pullRequests: PullRequestSearchItem[]) => {
+        const returnedPRs: number[] = []
         pullRequests.forEach((pr) => {
           pullRequest.value[pr.id] = pr
+          returnedPRs.push(pr.id)
         })
+
+        for (const id of Object.keys(pullRequest.value)) {
+          if (
+            returnedPRs.findIndex((it) => {
+              return it == +id
+            }) == -1
+          ) {
+            delete pullRequest.value[+id]
+          }
+        }
+
         isLoadingPullRequests.value = false
       })
   }
