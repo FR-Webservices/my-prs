@@ -2,7 +2,7 @@
   <nav class="mb-7 flex items-center">
     <div class="flex items-center justify-between">
       <router-link to="/" class="flex item-center space-x-3">
-        <IconMergeable height="25" width="25" color="#fff" />
+        <IconMergeable height="32" width="32" color="url(#ci)" />
         <span class="self-center text-2xl font-semibold whitespace-nowrap">My PRs</span>
       </router-link>
     </div>
