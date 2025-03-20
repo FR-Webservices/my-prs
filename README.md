@@ -2,7 +2,7 @@
 
 [My PRs](https://my-prs.com) is a website that makes developers' lives easier. Often, especially as senior developers, we “work” on several pull requests at the same time (e.g. we are working on an urgent bug fix while the current feature PR is still in draft and checking the code changes of three other developers in parallel).
 
-[My PRs](https://my-prs.com) helps to keep an overview of the various pull requests
+[My PRs](https://my-prs.com) helps to keep an overview of the various pull requests.
 
 ## Current limitations
 
