@@ -33,11 +33,8 @@ npm run dev
 #### Lint with [ESLint](https://eslint.org/)
 
 ```sh
-# Shows errors
+# Fixes linting errors
 npm run lint
-
-# Fixes errors
-npm run lint:fix
 ```
 
 #### Type-Check, Compile and Minify for Production
