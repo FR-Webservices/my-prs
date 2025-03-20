@@ -1,39 +1,33 @@
-# my-github-todos
+# [<img title="My PRs Logo" src="https://raw.githubusercontent.com/FR-Webservices/my-prs/refs/heads/main/dev_assets/Logo.svg" height="32" /> My PRs](https://my-prs.com)
 
-This template should help get you started developing with Vue 3 in Vite.
+[![GitHub License](https://img.shields.io/github/license/fr-webservices/my-prs)](LICENSE)
+[![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/fr-webservices/my-prs/deploy.yaml?label=Deployment%20Pipeline)](https://github.com/FR-Webservices/my-prs/actions/workflows/deploy.yaml)
+[![Website](https://img.shields.io/website?url=https%3A%2F%2Fmy-prs.com)](https://my-prs.com)
 
-## Recommended IDE Setup
+[My PRs](https://my-prs.com) is a website that makes developers' lives easier. Often, especially as senior developers, we “work” on several pull requests at the same time (e.g. we are working on an urgent bug fix while the current feature PR is still in draft and checking the code changes of three other developers in parallel).
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+[My PRs](https://my-prs.com) helps to keep an overview of the various pull requests.
 
-## Type Support for `.vue` Imports in TS
+## Current limitations
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
+- only works with GitHub
+- only supports personal access token (PAT) for authemtication
 
-## Customize configuration
+## 🤝 Contribution
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+Everyone is more than welcome to contribute to this project! That's what open source is all about!
 
-## Project Setup
+To have some contribution guidance, please have a look at [CONTRIBUTING.md](CONTRIBUTING.md).
 
-```sh
-npm install
-```
+## 👥 Contributors
 
-### Compile and Hot-Reload for Development
+<a title="Contributors" href="https://github.com/fr-webservices/my-prs/graphs/contributors">
+  <img alt="Contributors" src="https://contrib.rocks/image?repo=fr-webservices/my-prs" />
+</a>
 
-```sh
-npm run dev
-```
+Made with [contrib.rocks](https://contrib.rocks).
 
-### Type-Check, Compile and Minify for Production
+## ⚖️ License
 
-```sh
-npm run build
-```
+The source code of "My PRs" is free and unencumbered public domain software. For more information, see <https://unlicense.org/> or the accompanying [LICENSE](LICENSE) file.
 
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-npm run lint
-```
