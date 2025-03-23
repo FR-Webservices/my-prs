@@ -7,17 +7,18 @@ import {
   type PullRequestSearchItem,
   type RepositoryResponse,
 } from '@/models/PullRequest'
-import { initialDefaultTiming } from '@/models/RefreshTiming'
+import { initialDefaultTiming, noUpdateTiming } from '@/models/RefreshTiming'
+import { CronJob, CronTime } from 'cron'
 
 export const isLoadingPullRequests = ref(false)
 
 const pat = useStorage(githubPatKey, '')
 const username = ref('')
 const initialized = ref(false)
-const refreshIntervalTime = useStorage<number>(refreshIntervalKey, initialDefaultTiming)
+const refreshIntervalTime = useStorage<string>(refreshIntervalKey, initialDefaultTiming)
 const pullRequest = useStorage<PullRequestLocalStorage>(pullRequestsKey, {})
 
-let refreshInterval: number | undefined = undefined
+let refreshCronJob: CronJob
 
 let octokit: Octokit
 
@@ -26,8 +27,8 @@ interface UseGitHubReturn {
   fetchPullRequests: () => void
   getPullRequests: () => PullRequestSearchItem[]
   getRepository: (owner: string, name: string) => Promise<RepositoryResponse>
-  setInterval: (interval: number) => void
-  getInterval: () => number
+  setInterval: (interval: string) => void
+  getInterval: () => string
 }
 
 export function useGitHub(): UseGitHubReturn {
@@ -101,40 +102,22 @@ export function useGitHub(): UseGitHubReturn {
     }
   }
 
-  const setInterval = (intervalInput: number) => {
+  const setInterval = (intervalInput: string) => {
     console.log('setInterval', intervalInput)
     refreshIntervalTime.value = intervalInput
+    refreshCronJob.stop()
 
-    if (refreshIntervalTime.value === -1) {
-      clearRefreshInterval()
+    if (refreshIntervalTime.value == noUpdateTiming) {
       return
     }
 
-    setupRefreshInterval(intervalInput)
+    refreshCronJob.setTime(new CronTime(refreshIntervalTime.value))
+    refreshCronJob.start()
   }
 
-  const getInterval = (): number => {
+  const getInterval = (): string => {
     console.log('getInterval', refreshIntervalTime.value)
     return refreshIntervalTime.value
-  }
-
-  const setupRefreshInterval = (newIntervalTime: number): void => {
-    console.log('setupRefreshInterval: start', newIntervalTime)
-    if (refreshInterval !== undefined) {
-      clearRefreshInterval()
-    }
-
-    if (refreshIntervalTime.value === -1) {
-      console.log('setupRefreshInterval: disabled')
-      return
-    }
-
-    refreshInterval = window.setInterval(fetchPullRequests, newIntervalTime)
-  }
-
-  const clearRefreshInterval = () => {
-    console.log('setupRefreshInterval: clear interval')
-    window.clearInterval(refreshInterval)
   }
 
   if (!initialized.value) {
@@ -151,8 +134,10 @@ export function useGitHub(): UseGitHubReturn {
       username.value = data.data.login
     })
 
+    refreshCronJob = new CronJob(initialDefaultTiming, fetchPullRequests)
+    refreshCronJob.start()
+
     initialized.value = true
-    setupRefreshInterval(refreshIntervalTime.value)
   }
 
   return {

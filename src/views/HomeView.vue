@@ -50,7 +50,7 @@
 </template>
 
 <script setup lang="ts">
-import { useGitHub } from '@/composables/github';
+import { useGitHub } from '@/composables/useGithub';
 import invert from 'invert-color';
 import '@github/relative-time-element';
 import IconDraft from '@/icons/IconDraft.vue';
