@@ -135,6 +135,12 @@ export function useGitHub(): UseGitHubReturn {
     })
 
     refreshCronJob = new CronJob(initialDefaultTiming, fetchPullRequests)
+
+    // if no pr's in local storage trigger initial fetch
+    if (Object.keys(pullRequest.value).length == 0) {
+      fetchPullRequests()
+    }
+
     refreshCronJob.start()
 
     initialized.value = true
