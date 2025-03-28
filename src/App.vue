@@ -1,10 +1,11 @@
 <template>
   <div class="p-7">
     <header>
-      <NavBar />
+      <NavBar :isLoading="isLoading" />
     </header>
 
-    <Suspense>
+    <LoadingScreen :isLoading="isLoading" />
+    <Suspense v-if="!isLoading">
       <RouterView />
     </Suspense>
   </div>
@@ -12,7 +13,21 @@
 
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
-import NavBar from '@/components/NavBar.vue';
-</script>
+import NavBar from '@/components/NavBar.vue'
+import LoadingScreen from "@/views/LoadingView.vue"
+import { onMounted, ref } from 'vue';
+import { useMigrations } from './migrations/useMigrations';
 
-<style scoped></style>
+const isLoading = ref<boolean>(true);
+
+const { isMigrationAvailable, performDataMigration } = useMigrations()
+
+onMounted(async () => {
+  if (isMigrationAvailable()) {
+    await performDataMigration()
+  }
+
+  isLoading.value = false
+});
+
+</script>
