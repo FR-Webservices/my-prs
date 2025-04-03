@@ -14,9 +14,9 @@
   },
   "dependencies": {
     "@github/relative-time-element": "^4.4.5",
-    "@tailwindcss/vite": "^4.0.11",
+    "@tailwindcss/vite": "^4.0.17",
     "@vueuse/core": "^12.8.2",
-    "cron": "^4.1.0",
+    "cron": "^4.1.3",
     "invert-color": "^2.0.0",
     "octokit": "^4.1.2",
     "tailwindcss": "^4.0.10",
