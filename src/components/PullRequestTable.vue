@@ -64,8 +64,8 @@ import IconMergeable from '@/icons/IconMergeable.vue'
 import '@github/relative-time-element'
 import type { PullRequestSearchItem } from '@/models/PullRequest'
 
-const selectedPullRequests = ref<PullRequestSearchItem[]>()
-const filters = ref()
+const selectedPullRequests = ref<PullRequestSearchItem[]>([])
+const filters = ref({})
 
 const { getPullRequests, extractGitHubRepoFromUrl } = useGitHub()
 
