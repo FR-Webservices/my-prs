@@ -69,6 +69,11 @@ const filters = ref()
 
 const { getPullRequests, extractGitHubRepoFromUrl } = useGitHub()
 
+const getRepoString = (url: string): string => {
+  const { owner, name } = extractGitHubRepoFromUrl(url)
+  return `${owner}/${name}`
+}
+
 const filterRepositoriesByStartsWith = (url: string, value: string): boolean => {
   return getRepoString(url).startsWith(value)
 }
@@ -91,11 +96,6 @@ const initFilters = () => {
 
 const clearFilter = () => {
   initFilters()
-}
-
-const getRepoString = (url: string): string => {
-  const { owner, name } = extractGitHubRepoFromUrl(url)
-  return `${owner}/${name}`
 }
 
 const onRowSelect = (event: DataTableRowSelectEvent<PullRequestSearchItem>) => {
