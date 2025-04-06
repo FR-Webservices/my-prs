@@ -3,7 +3,7 @@
 
     <template #header>
       <div class="flex justify-between">
-        <Button @click="clearFilter" label="Clear filter" />
+        <FormButton @click="clearFilter" label="Clear filter" />
 
         <IconField>
           <InputText v-model="filters['global'].value" placeholder="Search" />
@@ -58,7 +58,7 @@ import { FilterMatchMode, FilterOperator, FilterService } from '@primevue/core/a
 import type { DataTableRowSelectEvent } from 'primevue/datatable'
 import { useGitHub } from '@/composables/useGithub'
 import invert from 'invert-color'
-import Button from '@/components/form/Button.vue'
+import FormButton from '@/components/form/FormButton.vue'
 import IconDraft from '@/icons/IconDraft.vue'
 import IconMergeable from '@/icons/IconMergeable.vue'
 import '@github/relative-time-element'
