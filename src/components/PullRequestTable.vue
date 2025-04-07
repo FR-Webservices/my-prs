@@ -66,7 +66,7 @@ import type { PullRequestSearchItem } from '@/models/PullRequest'
 import { initialFilters } from '@/models/Filters'
 
 const selectedPullRequests = ref<PullRequestSearchItem[]>([])
-const filters = ref<DataTableFilterMeta>(initialFilters)
+const filters = ref<DataTableFilterMeta>(structuredClone(initialFilters))
 
 const { getPullRequests, extractGitHubRepoFromUrl } = useGitHub()
 
@@ -80,7 +80,7 @@ const filterRepositoriesByStartsWith = (url: string, value: string): boolean => 
 }
 
 const clearFilter = () => {
-  filters.value = initialFilters;
+  filters.value = structuredClone(initialFilters);
   (filters.value.global as DataTableFilterMetaData).value = ''
 }
 
