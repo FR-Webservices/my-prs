@@ -54,7 +54,7 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue'
-import { FilterMatchMode, FilterOperator, FilterService } from '@primevue/core/api'
+import { FilterService } from '@primevue/core/api'
 import type { DataTableRowSelectEvent } from 'primevue/datatable'
 import { useGitHub } from '@/composables/useGithub'
 import invert from 'invert-color'
@@ -63,9 +63,11 @@ import IconDraft from '@/icons/IconDraft.vue'
 import IconMergeable from '@/icons/IconMergeable.vue'
 import '@github/relative-time-element'
 import type { PullRequestSearchItem } from '@/models/PullRequest'
+import type { Filters } from '@/models/Filters'
+import { initialFilters } from '@/models/InitialFilters'
 
 const selectedPullRequests = ref<PullRequestSearchItem[]>([])
-const filters = ref({})
+const filters = ref<Filters>(initialFilters)
 
 const { getPullRequests, extractGitHubRepoFromUrl } = useGitHub()
 
@@ -80,27 +82,11 @@ const filterRepositoriesByStartsWith = (url: string, value: string): boolean => 
 
 FilterService.register('filterRepositoriesByStartsWith', filterRepositoriesByStartsWith);
 
-const initFilters = () => {
-  filters.value = {
-    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    html_url: {
-      operator: FilterOperator.AND,
-      constraints: [{
-        value: null,
-        matchMode: 'filterRepositoriesByStartsWith'
-      }]
-    },
-    updated_at: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }] },
-  }
-}
-
 const clearFilter = () => {
-  initFilters()
+  filters.value = initialFilters
 }
 
 const onRowSelect = (event: DataTableRowSelectEvent<PullRequestSearchItem>) => {
   window.open(event.data.html_url, '_blank')
 }
-
-initFilters()
 </script>
