@@ -1,7 +1,7 @@
 import type { FilterMatchMode, FilterOperator } from 'primevue/api'
 
 interface FilterConstraint {
-  value: null
+  value: string | null
   matchMode: FilterMatchMode | string // custom string like 'filterRepositoriesByStartsWith'
 }
 
@@ -11,7 +11,7 @@ interface FieldFilter {
 }
 
 interface GlobalFilter {
-  value: null
+  value: string | null
   matchMode: FilterMatchMode
 }
 

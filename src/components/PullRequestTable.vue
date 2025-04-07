@@ -6,7 +6,7 @@
         <FormButton @click="clearFilter" label="Clear filter" />
 
         <IconField>
-          <InputText v-model="filters['global'].value" placeholder="Search" />
+          <InputText v-model="filters.global.value" placeholder="Search" />
         </IconField>
       </div>
     </template>
@@ -80,13 +80,14 @@ const filterRepositoriesByStartsWith = (url: string, value: string): boolean => 
   return getRepoString(url).startsWith(value)
 }
 
-FilterService.register('filterRepositoriesByStartsWith', filterRepositoriesByStartsWith);
-
 const clearFilter = () => {
   filters.value = initialFilters
+  filters.value.global.value = null
 }
 
 const onRowSelect = (event: DataTableRowSelectEvent<PullRequestSearchItem>) => {
   window.open(event.data.html_url, '_blank')
 }
+
+FilterService.register('filterRepositoriesByStartsWith', filterRepositoriesByStartsWith);
 </script>
