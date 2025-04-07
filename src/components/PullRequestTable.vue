@@ -6,7 +6,7 @@
         <FormButton @click="clearFilter" label="Clear filter" />
 
         <IconField>
-          <InputText v-model="filters.global.value" placeholder="Search" />
+          <InputText v-model="(filters.global as DataTableFilterMetaData).value" placeholder="Search" />
         </IconField>
       </div>
     </template>
@@ -24,7 +24,7 @@
       </template>
     </Column>
 
-    <Column field="repository" header="Repository" sortable :filter="true" filterField="html_url" :filterMatchModeOptions="[{ label: 'Starts with', value: 'filterRepositoriesByStartsWith' }]" :filterFunction="filterRepositoriesByStartsWith">
+    <Column field="html_url" header="Repository" sortable :filter="true" :filterMatchModeOptions="[{ label: 'Starts with', value: 'filterRepositoriesByStartsWith' }]" :filterFunction="filterRepositoriesByStartsWith">
       <template #body="{ data }">
         {{ getRepoString(data.html_url) }}
       </template>
@@ -55,7 +55,7 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
 import { FilterService } from '@primevue/core/api'
-import type { DataTableRowSelectEvent } from 'primevue/datatable'
+import type { DataTableFilterMeta, DataTableFilterMetaData, DataTableRowSelectEvent } from 'primevue/datatable'
 import { useGitHub } from '@/composables/useGithub'
 import invert from 'invert-color'
 import FormButton from '@/components/form/FormButton.vue'
@@ -63,11 +63,10 @@ import IconDraft from '@/icons/IconDraft.vue'
 import IconMergeable from '@/icons/IconMergeable.vue'
 import '@github/relative-time-element'
 import type { PullRequestSearchItem } from '@/models/PullRequest'
-import type { Filters } from '@/models/Filters'
-import { initialFilters } from '@/models/InitialFilters'
+import { initialFilters } from '@/models/Filters'
 
 const selectedPullRequests = ref<PullRequestSearchItem[]>([])
-const filters = ref<Filters>(initialFilters)
+const filters = ref<DataTableFilterMeta>(initialFilters)
 
 const { getPullRequests, extractGitHubRepoFromUrl } = useGitHub()
 
@@ -81,8 +80,8 @@ const filterRepositoriesByStartsWith = (url: string, value: string): boolean => 
 }
 
 const clearFilter = () => {
-  filters.value = initialFilters
-  filters.value.global.value = null
+  filters.value = initialFilters;
+  (filters.value.global as DataTableFilterMetaData).value = ''
 }
 
 const onRowSelect = (event: DataTableRowSelectEvent<PullRequestSearchItem>) => {
