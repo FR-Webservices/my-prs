@@ -10,5 +10,5 @@ interface Props {
   disabled?: boolean
 }
 
-const { disabled = false } = defineProps<Props>();
+defineProps<Props>();
 </script>
