@@ -26,24 +26,24 @@
     "vue-router": "^4.5.0"
   },
   "devDependencies": {
-    "@primevue/auto-import-resolver": "^4.3.3",
+    "@primevue/auto-import-resolver": "^4.3.4",
     "@octokit/types": "^13.10.0",
-    "@tsconfig/node22": "^22.0.1",
-    "@types/node": "^22.13.15",
-    "@vitejs/plugin-vue": "^5.2.1",
+    "@tsconfig/node22": "^22.0.2",
+    "@types/node": "^22.15.29",
+    "@vitejs/plugin-vue": "^5.2.4",
     "@vue/eslint-config-prettier": "^10.2.0",
     "@vue/eslint-config-typescript": "^14.5.0",
     "@vue/tsconfig": "^0.7.0",
-    "eslint": "^9.23.0",
-    "eslint-plugin-vue": "^10.0.0",
+    "eslint": "^9.28.0",
+    "eslint-plugin-vue": "^10.1.0",
     "jiti": "^2.4.2",
     "npm-run-all2": "^7.0.2",
     "prettier": "^3.5.1",
-    "typescript": "~5.8.2",
-    "unplugin-vue-components": "^28.4.1",
-    "vite": "^6.2.4",
+    "typescript": "~5.8.3",
+    "unplugin-vue-components": "^28.7.0",
+    "vite": "^6.3.5",
     "vite-plugin-mkcert": "^1.17.7",
-    "vite-plugin-vue-devtools": "^7.7.2",
-    "vue-tsc": "^2.2.2"
+    "vite-plugin-vue-devtools": "^7.7.6",
+    "vue-tsc": "^2.2.10"
   }
 }
