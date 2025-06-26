@@ -1,5 +1,5 @@
 <template>
-  <DataTable v-model:filters="filters" v-model:selection="selectedPullRequests" :value="getPullRequests()" dataKey="id" filterDisplay="menu" :globalFilterFields="['title', 'user.login', 'body', 'html_url', 'number']" removableSort selectionMode="single" @rowSelect="onRowSelect">
+  <DataTable v-model:filters="filters" v-model:selection="selectedPullRequests" :value="github.getPullRequests()" dataKey="id" filterDisplay="menu" :globalFilterFields="['title', 'user.login', 'body', 'html_url', 'number']" removableSort selectionMode="single" @rowSelect="onRowSelect">
 
     <template #header>
       <div class="flex justify-between">
@@ -16,11 +16,10 @@
 
     <Column field="number" header="Number" sortable>
       <template #body="{ data }">
-        <div class="inline pr-1">
-          <IconDraft v-if="data.draft" class="inline" />
-          <IconMergeable color="green" v-else class="inline" />
-        </div>
-        #{{ data.number }}
+        <span class="flex items-center">
+          <PullRequestStatusIcon :draft="data.draft" :reviewStatus="data.reviewStatus" class="mr-2" />
+          <span>#{{ data.number }}</span>
+        </span>
       </template>
     </Column>
 
@@ -53,22 +52,32 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { FilterService } from '@primevue/core/api'
 import type { DataTableFilterMeta, DataTableFilterMetaData, DataTableRowSelectEvent } from 'primevue/datatable'
-import { useGitHub } from '@/composables/useGithub'
+import { useGitHub, extractGitHubRepoFromUrl } from '@/composables/useGithub'
 import invert from 'invert-color'
 import FormButton from '@/components/form/FormButton.vue'
-import IconDraft from '@/icons/IconDraft.vue'
-import IconMergeable from '@/icons/IconMergeable.vue'
 import '@github/relative-time-element'
-import type { PullRequestSearchItem } from '@/models/PullRequest'
+import type { PullRequest } from '@/models/PullRequest'
 import { initialFilters } from '@/models/Filters'
+import PullRequestStatusIcon from '@/components/PullRequestStatusIcon.vue'
 
-const selectedPullRequests = ref<PullRequestSearchItem[]>([])
+const selectedPullRequests = ref<PullRequest[]>([])
 const filters = ref<DataTableFilterMeta>(structuredClone(initialFilters))
 
-const { getPullRequests, extractGitHubRepoFromUrl } = useGitHub()
+// Get the full composable instance
+const github = useGitHub()
+
+onMounted(async () => {
+  try {
+    await github.init()
+  } catch (err) {
+    // Show error to user
+    console.log('GitHub authentication failed.', err)
+    alert('GitHub authentication failed. Please check your token.')
+  }
+})
 
 const getRepoString = (url: string): string => {
   const { owner, name } = extractGitHubRepoFromUrl(url)
@@ -84,7 +93,7 @@ const clearFilter = () => {
   (filters.value.global as DataTableFilterMetaData).value = ''
 }
 
-const onRowSelect = (event: DataTableRowSelectEvent<PullRequestSearchItem>) => {
+const onRowSelect = (event: DataTableRowSelectEvent<PullRequest>) => {
   window.open(event.data.html_url, '_blank')
 }
 
