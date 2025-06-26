@@ -8,15 +8,11 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
-    Button: typeof import('primevue/button')['default']
     Column: typeof import('primevue/column')['default']
     DataTable: typeof import('primevue/datatable')['default']
-    DatePicker: typeof import('primevue/datepicker')['default']
     FormButton: typeof import('./src/components/form/FormButton.vue')['default']
     IconField: typeof import('primevue/iconfield')['default']
-    InputIcon: typeof import('primevue/inputicon')['default']
     InputText: typeof import('primevue/inputtext')['default']
-    MultiSelect: typeof import('primevue/multiselect')['default']
     NavBar: typeof import('./src/components/NavBar.vue')['default']
     PullRequestStatusIcon: typeof import('./src/components/PullRequestStatusIcon.vue')['default']
     PullRequestTable: typeof import('./src/components/PullRequestTable.vue')['default']

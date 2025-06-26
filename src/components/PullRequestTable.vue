@@ -57,11 +57,11 @@ import { useGitHub } from '@/composables/useGithub'
 import invert from 'invert-color'
 import FormButton from '@/components/form/FormButton.vue'
 import '@github/relative-time-element'
-import type { PullRequestSearchItem } from '@/models/PullRequest'
+import type { PullRequest } from '@/models/PullRequest'
 import { initialFilters } from '@/models/Filters'
 import PullRequestStatusIcon from '@/components/PullRequestStatusIcon.vue'
 
-const selectedPullRequests = ref<PullRequestSearchItem[]>([])
+const selectedPullRequests = ref<PullRequest[]>([])
 const filters = ref<DataTableFilterMeta>(structuredClone(initialFilters))
 
 const { getPullRequests, extractGitHubRepoFromUrl } = useGitHub()
@@ -80,7 +80,7 @@ const clearFilter = () => {
   (filters.value.global as DataTableFilterMetaData).value = ''
 }
 
-const onRowSelect = (event: DataTableRowSelectEvent<PullRequestSearchItem>) => {
+const onRowSelect = (event: DataTableRowSelectEvent<PullRequest>) => {
   window.open(event.data.html_url, '_blank')
 }
 
