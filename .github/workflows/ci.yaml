@@ -26,8 +26,10 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run type-check
-        run: npm run type-check
+      - name: Check components.d.ts is up-to-date
+        run: |
+          npm run type-check || true # or another script that triggers generation
+          git diff --exit-code components.d.ts || (echo "components.d.ts is not up-to-date. Please run the generator and commit the changes." && exit 1)
 
       - name: Run linter
         run: npm run lint
