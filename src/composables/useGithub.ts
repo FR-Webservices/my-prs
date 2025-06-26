@@ -2,14 +2,16 @@ import { Octokit } from 'octokit'
 import { ref } from 'vue'
 import { useStorage } from '@vueuse/core'
 import { githubPatKey, pullRequestsKey, refreshIntervalKey } from '@/localStorageKeys'
-import {
-  type PullRequestLocalStorage,
-  type PullRequest,
-  type GraphQLViewerResult,
-  type GraphQLResult,
+import type {
+  PullRequestLocalStorage,
+  PullRequest,
+  GraphQLViewerResult,
+  GraphQLResult,
 } from '@/models/PullRequest'
+import { ReviewStatus } from '@/models/PullRequest'
 import { initialDefaultTiming, noUpdateTiming } from '@/models/RefreshTiming'
 import { CronJob, CronTime } from 'cron'
+import {PULL_REQUESTS_QUERY} from '@/composables/graphql-queries/pull-request'
 
 export const isLoadingPullRequests = ref(false)
 
@@ -23,11 +25,11 @@ let refreshCronJob: CronJob
 let octokit: Octokit
 
 interface UseGitHubReturn {
-  extractGitHubRepoFromUrl: (url: string) => { owner: string; name: string }
   fetchPullRequests: () => void
   getPullRequests: () => PullRequest[]
   setInterval: (interval: string) => void
   getInterval: () => string
+  init: () => Promise<void>
 }
 
 export function useGitHub(): UseGitHubReturn {
@@ -48,87 +50,73 @@ export function useGitHub(): UseGitHubReturn {
 
   const fetchViewerLogin = async (): Promise<string> => {
     const query = `query { viewer { login } }`
-    const result: GraphQLViewerResult = await octokit.graphql<GraphQLViewerResult>(query)
-    return result.viewer.login
+    try {
+      const result: GraphQLViewerResult = await octokit.graphql<GraphQLViewerResult>(query)
+      return result.viewer.login
+    } catch {
+      throw new Error('Failed to fetch viewer login')
+    }
   }
-
-  const fetchPullRequests = async () => {
+  const fetchPullRequests = async (): Promise<void> => {
     console.log('fetchPullRequests: start (GraphQL)')
     isLoadingPullRequests.value = true
-    // Get username if not set
-    if (!username.value) {
-      username.value = await fetchViewerLogin()
-    }
-    // GraphQL query for PRs involving the user
-    const query = `
-      query($after: String) {
-        search(query: "type:pr state:open involves:@me", type: ISSUE, first: 50, after: $after) {
-          pageInfo { hasNextPage endCursor }
-          nodes {
-            ... on PullRequest {
-              id
-              number
-              title
-              updatedAt
-              url
-              repository {
-                name
-                owner { login }
-              }
-              isDraft
-              reviewRequests(first: 10) {
-                nodes { requestedReviewer { ... on User { login } } }
-              }
-              reviews(last: 10, author: "${username.value}") {
-                nodes {
-                  state
-                  submittedAt
-                }
-              }
-              labels(first: 10) {
-                nodes { name color }
-              }
+    try {
+      // Get username if not set
+      if (!username.value) {
+        username.value = await fetchViewerLogin()
+      }
+      // GraphQL query for PRs involving the user
+      let hasNextPage = true
+      let after: string | null = null
+      const allPRs: PullRequest[] = []
+
+      while (hasNextPage) {
+        const result: GraphQLResult = await octokit.graphql<GraphQLResult>(PULL_REQUESTS_QUERY, { after, author: username.value })
+        const { nodes, pageInfo } = result.search
+
+        for (const pr of nodes) {
+          if (typeof pr.isDraft === 'undefined') continue
+          let reviewStatus: ReviewStatus = ReviewStatus.NotReviewed
+          const latestReview = pr.reviews.nodes.length > 0 ? pr.reviews.nodes[pr.reviews.nodes.length - 1] : null
+
+          if (latestReview) {
+            if (Object.values(ReviewStatus).includes(latestReview.state as ReviewStatus)) {
+              reviewStatus = latestReview.state as ReviewStatus
+            } else {
+              reviewStatus = ReviewStatus.NotReviewed
             }
+          } else if (pr.reviewRequests.nodes.some((n) => n.requestedReviewer?.login === username.value)) {
+            reviewStatus = ReviewStatus.Pending
           }
+
+          allPRs.push({
+            id: pr.id,
+            number: pr.number,
+            title: pr.title,
+            updated_at: pr.updatedAt,
+            html_url: pr.url,
+            repository_url: pr.repository.owner.login + '/' + pr.repository.name,
+            draft: pr.isDraft,
+            reviewStatus,
+            labels: pr.labels.nodes,
+          })
         }
+
+        hasNextPage = pageInfo.hasNextPage
+        after = pageInfo.endCursor
       }
-    `
-    let hasNextPage = true
-    let after: string | null = null
-    const allPRs: PullRequest[] = []
-    while (hasNextPage) {
-      const result: GraphQLResult = await octokit.graphql<GraphQLResult>(query, { after })
-      const search = result.search
-      for (const pr of search.nodes) {
-        if (typeof pr.isDraft === 'undefined') continue; // skip non-PRs or PRs without draft field
-        let reviewStatus = 'not reviewed'
-        if (pr.reviewRequests.nodes.some((n) => n.requestedReviewer?.login === username.value)) {
-          reviewStatus = 'pending'
-        } else if (pr.reviews.nodes.length > 0) {
-          const latest = pr.reviews.nodes[pr.reviews.nodes.length - 1]
-          reviewStatus = latest.state.toLowerCase()
-        }
-        allPRs.push({
-          id: pr.id,
-          number: pr.number,
-          title: pr.title,
-          updated_at: pr.updatedAt,
-          html_url: pr.url,
-          repository_url: pr.repository.owner.login + '/' + pr.repository.name,
-          draft: pr.isDraft,
-          reviewStatus,
-          labels: pr.labels.nodes,
-        })
+
+      pullRequest.value = {}
+
+      for (const pr of allPRs) {
+        pullRequest.value[pr.number] = pr
       }
-      hasNextPage = search.pageInfo.hasNextPage
-      after = search.pageInfo.endCursor
+    } catch (err) {
+      // TODO: present error to user
+      throw err
+    } finally {
+      isLoadingPullRequests.value = false
     }
-    // Store PRs
-    pullRequest.value = {}
-    for (const pr of allPRs) {
-      pullRequest.value[pr.number] = pr
-    }
-    isLoadingPullRequests.value = false
   }
 
   const getPullRequests = (): PullRequest[] => {
@@ -137,16 +125,7 @@ export function useGitHub(): UseGitHubReturn {
     )
   }
 
-  const extractGitHubRepoFromUrl = (url: string): { owner: string; name: string } => {
-    const match = url.match(/github\.com\/(?:repos\/)?(?<owner>[\w.-]+)\/(?<name>[\w.-]+)/)
-    if (!match || !(match.groups?.owner && match.groups?.name)) return { name: '', owner: '' }
-    return {
-      name: match.groups.name,
-      owner: match.groups.owner,
-    }
-  }
-
-  const setInterval = (intervalInput: string) => {
+  const setInterval = (intervalInput: string): void => {
     console.log('setInterval', intervalInput)
     refreshIntervalTime.value = intervalInput
     refreshCronJob.stop()
@@ -162,7 +141,8 @@ export function useGitHub(): UseGitHubReturn {
     return refreshIntervalTime.value
   }
 
-  if (!initialized.value) {
+  const init = async (): Promise<void> => {
+    if (initialized.value) return
     if (pat.value.length == 0) {
       pat.value = askForPat()
     }
@@ -171,10 +151,10 @@ export function useGitHub(): UseGitHubReturn {
       userAgent: 'my-prs/v0.0.0',
       previews: ['shadow-cat'],
     })
-    fetchViewerLogin().then(login => { username.value = login })
+    username.value = await fetchViewerLogin()
     refreshCronJob = new CronJob(initialDefaultTiming, fetchPullRequests)
     if (Object.keys(pullRequest.value).length == 0) {
-      fetchPullRequests()
+      await fetchPullRequests()
     }
     refreshCronJob.start()
     initialized.value = true
@@ -182,9 +162,18 @@ export function useGitHub(): UseGitHubReturn {
 
   return {
     getPullRequests,
-    extractGitHubRepoFromUrl,
     fetchPullRequests,
     setInterval,
     getInterval,
+    init,
+  }
+}
+
+export function extractGitHubRepoFromUrl(url: string): { owner: string; name: string } {
+  const match = url.match(/github\.com\/(?:repos\/)?(?<owner>[\w.-]+)\/(?<name>[\w.-]+)/)
+  if (!match || !(match.groups?.owner && match.groups?.name)) return { name: '', owner: '' }
+  return {
+    name: match.groups.name,
+    owner: match.groups.owner,
   }
 }

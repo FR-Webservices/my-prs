@@ -12,6 +12,15 @@ export type PullRequest = {
 
 export type PullRequestLocalStorage = Record<number, PullRequest>
 
+export enum ReviewStatus {
+  NotReviewed = 'NOT_REVIEWED',
+  Pending = 'PENDING',
+  Approved = 'APPROVED',
+  ChangesRequested = 'CHANGES_REQUESTED',
+  Commented = 'COMMENTED',
+  Dismissed = 'DISMISSED',
+}
+
 // --- GraphQL Types ---
 type GraphQLReviewNode = {
   state: string

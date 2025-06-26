@@ -1,5 +1,5 @@
 <template>
-  <DataTable v-model:filters="filters" v-model:selection="selectedPullRequests" :value="getPullRequests()" dataKey="id" filterDisplay="menu" :globalFilterFields="['title', 'user.login', 'body', 'html_url', 'number']" removableSort selectionMode="single" @rowSelect="onRowSelect">
+  <DataTable v-model:filters="filters" v-model:selection="selectedPullRequests" :value="github.getPullRequests()" dataKey="id" filterDisplay="menu" :globalFilterFields="['title', 'user.login', 'body', 'html_url', 'number']" removableSort selectionMode="single" @rowSelect="onRowSelect">
 
     <template #header>
       <div class="flex justify-between">
@@ -50,10 +50,10 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { FilterService } from '@primevue/core/api'
 import type { DataTableFilterMeta, DataTableFilterMetaData, DataTableRowSelectEvent } from 'primevue/datatable'
-import { useGitHub } from '@/composables/useGithub'
+import { useGitHub, extractGitHubRepoFromUrl } from '@/composables/useGithub'
 import invert from 'invert-color'
 import FormButton from '@/components/form/FormButton.vue'
 import '@github/relative-time-element'
@@ -64,7 +64,18 @@ import PullRequestStatusIcon from '@/components/PullRequestStatusIcon.vue'
 const selectedPullRequests = ref<PullRequest[]>([])
 const filters = ref<DataTableFilterMeta>(structuredClone(initialFilters))
 
-const { getPullRequests, extractGitHubRepoFromUrl } = useGitHub()
+// Get the full composable instance
+const github = useGitHub()
+
+onMounted(async () => {
+  try {
+    await github.init()
+  } catch (err) {
+    // Show error to user
+    console.log('GitHub authentication failed.', err)
+    alert('GitHub authentication failed. Please check your token.')
+  }
+})
 
 const getRepoString = (url: string): string => {
   const { owner, name } = extractGitHubRepoFromUrl(url)
