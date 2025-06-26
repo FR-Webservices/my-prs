@@ -5,6 +5,6 @@ export type RepositoryResponse = RestEndpointMethodTypes['repos']['get']['respon
 
 export type PullRequestSearchItem = InferArrayType<
   RestEndpointMethodTypes['search']['issuesAndPullRequests']['response']['data']['items']
->
+> & { reviewStatus: string }
 
 export type PullRequestLocalStorage = Record<number, PullRequestSearchItem>

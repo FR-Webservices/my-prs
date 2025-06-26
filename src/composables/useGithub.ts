@@ -61,12 +61,23 @@ export function useGitHub(): UseGitHubReturn {
         q: 'type:pr+state:open+involves:@me',
         sort: 'updated',
       })
-      .then((pullRequests: PullRequestSearchItem[]) => {
+      .then(async (pullRequests: PullRequestSearchItem[]) => {
         const returnedPRs: number[] = []
-        pullRequests.forEach((pr) => {
+        for (const pr of pullRequests) {
+          const { owner, name } = extractGitHubRepoFromUrl(pr.repository_url)
+          if (!owner || !name) {
+            console.warn('Could not extract owner/repo from', pr.repository_url)
+            pr.reviewStatus = 'unknown'
+            pullRequest.value[pr.id] = pr
+            returnedPRs.push(pr.id)
+            continue
+          }
+
+          // Fetch review status for PR
+          pr.reviewStatus = await fetchReviewStatusForPR(owner, name, pr.number, username.value)
           pullRequest.value[pr.id] = pr
           returnedPRs.push(pr.id)
-        })
+        }
 
         for (const id of Object.keys(pullRequest.value)) {
           if (
@@ -82,6 +93,44 @@ export function useGitHub(): UseGitHubReturn {
       })
   }
 
+  async function fetchReviewStatusForPR(owner: string, repo: string, prNumber: number, username: string): Promise<string> {
+    // 1. Fetch PR details
+    const prDetails = await octokit.rest.pulls.get({ owner, repo, pull_number: prNumber });
+    // 2. Fetch reviews
+
+    const { data: reviews } = await octokit.rest.pulls.listReviews({
+      owner,
+      repo,
+      pull_number: prNumber,
+    });
+
+    // 3. Find the latest review by the user
+    const userReviews = reviews.filter(r => r.user?.login === username);
+    if (userReviews.length === 0) {
+      // If you are a requested reviewer, status is pending
+      const requestedReviewers = (prDetails.data.requested_reviewers as Array<{ login: string }> | undefined)?.map(u => u.login) || [];
+      if (requestedReviewers.includes(username)) {
+        return 'pending';
+      }
+      return 'not reviewed';
+    }
+    const latestReview = userReviews[userReviews.length - 1];
+
+    // 4. Get the latest commit date
+    const latestCommitSha = prDetails.data.head.sha;
+    const commit = await octokit.rest.repos.getCommit({ owner, repo, ref: latestCommitSha });
+    const latestCommitDate = new Date(commit.data.commit.committer?.date || commit.data.commit.author?.date || prDetails.data.updated_at);
+    const latestReviewDate = new Date(latestReview.submitted_at || "");
+
+    // 5. If review is before latest commit, status is pending/stale
+    if (latestReviewDate < latestCommitDate) {
+      return 'pending';
+    }
+
+    // 6. Otherwise, use the review state
+    return latestReview.state.toLowerCase(); // "approved", "changes_requested", "commented", etc.
+  }
+
   const getPullRequests = (): PullRequestSearchItem[] => {
     return Object.values<PullRequestSearchItem>(pullRequest.value).sort(
       (a, b) => Date.parse(b.updated_at) - Date.parse(a.updated_at),
@@ -93,7 +142,7 @@ export function useGitHub(): UseGitHubReturn {
   }
 
   const extractGitHubRepoFromUrl = (url: string): { owner: string; name: string } => {
-    const match = url.match(/^https?:\/\/(www\.)?github.com\/(?<owner>[\w.-]+)\/(?<name>[\w.-]+)/)
+    const match = url.match(/github\.com\/(?:repos\/)?(?<owner>[\w.-]+)\/(?<name>[\w.-]+)/)
     if (!match || !(match.groups?.owner && match.groups?.name)) return { name: '', owner: '' }
 
     return {

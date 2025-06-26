@@ -16,11 +16,8 @@
 
     <Column field="number" header="Number" sortable>
       <template #body="{ data }">
-        <div class="inline pr-1">
-          <IconDraft v-if="data.draft" class="inline" />
-          <IconMergeable color="green" v-else class="inline" />
-        </div>
-        #{{ data.number }}
+        <PullRequestStatusIcon :draft="data.draft" :reviewStatus="data.reviewStatus" />
+        <span class="ml-1">#{{ data.number }}</span>
       </template>
     </Column>
 
@@ -59,11 +56,10 @@ import type { DataTableFilterMeta, DataTableFilterMetaData, DataTableRowSelectEv
 import { useGitHub } from '@/composables/useGithub'
 import invert from 'invert-color'
 import FormButton from '@/components/form/FormButton.vue'
-import IconDraft from '@/icons/IconDraft.vue'
-import IconMergeable from '@/icons/IconMergeable.vue'
 import '@github/relative-time-element'
 import type { PullRequestSearchItem } from '@/models/PullRequest'
 import { initialFilters } from '@/models/Filters'
+import PullRequestStatusIcon from '@/components/PullRequestStatusIcon.vue'
 
 const selectedPullRequests = ref<PullRequestSearchItem[]>([])
 const filters = ref<DataTableFilterMeta>(structuredClone(initialFilters))

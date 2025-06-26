@@ -18,6 +18,7 @@ declare module 'vue' {
     InputText: typeof import('primevue/inputtext')['default']
     MultiSelect: typeof import('primevue/multiselect')['default']
     NavBar: typeof import('./src/components/NavBar.vue')['default']
+    PullRequestStatusIcon: typeof import('./src/components/PullRequestStatusIcon.vue')['default']
     PullRequestTable: typeof import('./src/components/PullRequestTable.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
