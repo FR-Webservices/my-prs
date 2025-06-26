@@ -16,8 +16,10 @@
 
     <Column field="number" header="Number" sortable>
       <template #body="{ data }">
-        <PullRequestStatusIcon :draft="data.draft" :reviewStatus="data.reviewStatus" />
-        <span class="ml-1">#{{ data.number }}</span>
+        <span class="flex items-center">
+          <PullRequestStatusIcon :draft="data.draft" :reviewStatus="data.reviewStatus" class="mr-2" />
+          <span>#{{ data.number }}</span>
+        </span>
       </template>
     </Column>
 

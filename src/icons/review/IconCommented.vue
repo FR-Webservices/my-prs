@@ -7,7 +7,7 @@
     :height="height"
   >
     <rect x="2" y="4" width="12" height="7" rx="3" :fill="color" />
-    <polygon points="7,11 8,13 9,11" :fill="color" />
+    <polygon points="12,9 10,11 14,13" :fill="color" />
     <rect x="5" y="7" width="6" height="1.5" rx="0.75" fill="white"/>
   </svg>
 </template>

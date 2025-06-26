@@ -1,33 +1,33 @@
 <template>
   <span
-    class="relative inline-block"
-    style="width: 24px; height: 20px;"
+    class="relative inline-block align-middle"
+    style="width: 28px; height: 24px;"
     :title="statusTitle"
   >
     <span v-if="draft" class="absolute left-0 top-0">
-      <IconDraft :width="16" :height="16" />
+      <IconDraft :width="20" :height="20" />
     </span>
     <span v-else class="absolute left-0 top-0">
-      <IconMergeable :width="16" :height="16" color="#22c55e" />
+      <IconMergeable :width="20" :height="20" color="#22c55e" />
     </span>
 
     <span v-if="reviewStatus === ReviewStatus.Approved" class="absolute right-0 bottom-0">
-      <IconReviewApproved :width="12" :height="12" />
+      <IconReviewApproved :width="14" :height="14" />
     </span>
     <span v-else-if="reviewStatus === ReviewStatus.ChangesRequested" class="absolute right-0 bottom-0">
-      <IconReviewChanges :width="12" :height="12" />
+      <IconReviewChanges :width="14" :height="14" />
     </span>
     <span v-else-if="reviewStatus === ReviewStatus.Commented" class="absolute right-0 bottom-0">
-      <IconReviewCommented :width="12" :height="12" />
+      <IconReviewCommented :width="20" :height="20" />
     </span>
     <span v-else-if="reviewStatus === ReviewStatus.Pending" class="absolute right-0 bottom-0">
-      <IconReviewPending :width="12" :height="12" />
+      <IconReviewPending :width="14" :height="14" />
     </span>
     <span v-else-if="reviewStatus === ReviewStatus.Dismissed" class="absolute right-0 bottom-0">
-      <IconCross :width="12" :height="12" color="#9ca3af" />
+      <IconCross :width="14" :height="14" color="#9ca3af" />
     </span>
     <span v-else class="absolute right-0 bottom-0">
-      <IconReviewPending :width="12" :height="12" />
+      <IconReviewPending :width="14" :height="14" />
     </span>
   </span>
 </template>
