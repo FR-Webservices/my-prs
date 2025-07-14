@@ -9,8 +9,6 @@ updates:
     directory: /
     schedule:
       interval: monthly
-    reviewers:
-      - florianrusch
     labels:
       - dependencies
     commit-message:
@@ -42,8 +40,6 @@ updates:
     directory: /
     schedule:
       interval: monthly
-    reviewers:
-      - florianrusch
     labels:
       - ci
     commit-message:
