@@ -13,17 +13,17 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
-    "@github/relative-time-element": "^5.3.0",
-    "@primeuix/themes": "^3.0.0",
-    "@tailwindcss/vite": "^4.2.1",
+    "@github/relative-time-element": "^5.3.1",
+    "@primeuix/themes": "^3.1.0",
+    "@tailwindcss/vite": "^4.3.3",
     "@vueuse/core": "^14.4.0",
     "cron": "^4.4.0",
     "invert-color": "^3.0.0",
     "octokit": "^5.0.5",
-    "primevue": "^5.0.0",
+    "primevue": "^5.0.4",
     "tailwindcss": "^4.0.10",
-    "vue": "^3.5.29",
-    "vue-router": "^5.2.0"
+    "vue": "^3.5.44",
+    "vue-router": "^5.4.0"
   },
   "devDependencies": {
     "@primevue/auto-import-resolver": "^4.5.5",
